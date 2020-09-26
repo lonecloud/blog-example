@@ -39,7 +39,7 @@ public class ConditionBlocker implements Blocker {
     }
 
     @Override
-    public <T> T callWithGuard(GuardedAction<T> guardedAction) throws Exception {
+    public <T> T callWithGuard(GuardedAbstractAction<T> guardedAction) throws Exception {
         T result;
         lock.lockInterruptibly();
         try {

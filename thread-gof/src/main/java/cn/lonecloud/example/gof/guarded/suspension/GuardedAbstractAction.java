@@ -9,11 +9,11 @@ import java.util.concurrent.Callable;
  * @Description: TODO
  * @date 2020/9/265:01 下午
  */
-public abstract class GuardedAction<T> implements Callable<T> {
+public abstract class GuardedAbstractAction<T> implements Callable<T> {
 
     protected final Predicate predicate;
 
-    public GuardedAction(Predicate predicate) {
+    public GuardedAbstractAction(Predicate predicate) {
         this.predicate = predicate;
     }
 }

@@ -6,7 +6,7 @@ import java.util.concurrent.Callable;
  * @author lonecloud
  * @version v1.0
  * @Package cn.lonecloud.example.gof.guarded.suspension
- * @Description: TODO
+ * @Description: 阻塞器
  * @date 2020/9/265:02 下午
  */
 public interface Blocker {
@@ -19,7 +19,7 @@ public interface Blocker {
      * @return
      * @throws Exception
      */
-    <T> T callWithGuard(GuardedAction<T> guardedAction) throws Exception;
+    <T> T callWithGuard(GuardedAbstractAction<T> guardedAction) throws Exception;
 
     /**
      * 在执行stateOperation 所指定的操作后，决定是否唤醒本Block所暂挂的所有线程中的一个
@@ -29,6 +29,10 @@ public interface Blocker {
      */
     void signalAfter(Callable<Boolean> stateOperation) throws Exception;
 
+    /**
+     * 通知
+     * @throws InterruptedException
+     */
     void signal() throws InterruptedException;
 
     /**
