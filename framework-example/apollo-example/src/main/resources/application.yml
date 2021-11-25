@@ -1,0 +1,7 @@
+apollo:
+  bootstrap:
+    namespace: application.yml
+    enabled: true
+  meta: http://106.54.227.205:8080
+app:
+  id: apollo-dynamic-demo
