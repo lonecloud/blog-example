@@ -1,4 +1,4 @@
-package cn.lonecloud.blog.example.tools.filter;
+package cn.lonecloud.blog.example.tools.fastjson.filter;
 
 import cn.lonecloud.blog.example.tools.fastjson.annotation.BigDecimalFormatter;
 import com.alibaba.fastjson.serializer.ValueFilter;
