@@ -1,6 +1,5 @@
 package cn.lonecloud.apolloexample.config;
 
-import cn.lonecloud.apolloexample.bean.ConfigBeanDto;
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigService;
 import com.ctrip.framework.apollo.core.ConfigConsts;
@@ -17,10 +16,11 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationPropertiesBean;
+import org.springframework.cloud.context.properties.ConfigurationPropertiesBeans;
 import org.springframework.cloud.context.properties.ConfigurationPropertiesRebinder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
 
@@ -40,14 +40,15 @@ import java.util.concurrent.ConcurrentHashMap;
 @Configuration
 @ConditionalOnClass(ApolloConfigChangeListener.class)
 @ConditionalOnProperty(name = "apollo.bootstrap.enabled", matchIfMissing = true)
-public class ApolloConfigRefreshAwareConfiguration implements BeanPostProcessor {
+public class ApolloConfigRefreshAwareConfiguration implements BeanPostProcessor, ApplicationContextAware {
+
 
     private static final Logger logger = LoggerFactory.getLogger(ApolloConfigRefreshAwareConfiguration.class);
 
     @Value("${apollo.bootstrap.namespace:application}")
     private String namespace;
 
-    private Map<String, ConfigBeanDto> cacheBeanMap = new ConcurrentHashMap<>();
+    private Map<String, ConfigurationPropertiesBean> cacheBeanMap = new ConcurrentHashMap<>();
 
     @Autowired
     private ConfigurationPropertiesRebinder configurationPropertiesRebinder;
@@ -76,7 +77,7 @@ public class ApolloConfigRefreshAwareConfiguration implements BeanPostProcessor 
                             change.getChangeType());
                     //
                     cacheBeanMap.forEach((beanName, beanDto) -> {
-                        ConfigurationProperties configurationProperties = beanDto.getConfigurationProperties();
+                        ConfigurationProperties configurationProperties = beanDto.getAnnotation();
                         if (changedKey.startsWith(configurationProperties.prefix())) {
                             configurationPropertiesRebinder.rebind(beanName);
                             logger.warn("completed to refresh @ConfigurationProperties beans ");
@@ -89,11 +90,9 @@ public class ApolloConfigRefreshAwareConfiguration implements BeanPostProcessor 
     }
 
     @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        ConfigurationProperties properties = AnnotationUtils.findAnnotation(bean.getClass(), ConfigurationProperties.class);
-        if (Objects.nonNull(properties)) {
-            cacheBeanMap.put(beanName, new ConfigBeanDto(properties, bean));
-        }
-        return bean;
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        Map<String, ConfigurationPropertiesBean> allPropertiesBean = ConfigurationPropertiesBean.getAll(applicationContext);
+        cacheBeanMap.putAll(allPropertiesBean);
+
     }
 }
