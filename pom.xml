@@ -12,6 +12,7 @@
         <module>framework-example</module>
         <module>tools-example</module>
         <module>thread-gof</module>
+        <module>bigdata-example</module>
     </modules>
 
 
